@@ -23,12 +23,7 @@ public class Reservaciones {
     private static SessionFactory sessionFactory;
 
     static {
-        try {
-            sessionFactory = new Configuration().configure().buildSessionFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ExceptionInInitializerError("Error al crear SessionFactory.");
-        }
+       sessionFactory = new Configuration().configure().buildSessionFactory();
     }
 
     @POST
@@ -78,9 +73,10 @@ public class Reservaciones {
                     .entity("{\"error\":\"El motivo de consulta es obligatorio.\"}")
                     .build();
         }
-
+        Session session = null;
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
+        try {
+            session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
             ReservacionesBD reservacion = new ReservacionesBD();
@@ -95,8 +91,7 @@ public class Reservaciones {
             session.save(reservacion);
             transaction.commit();
 
-            return Response.status(Response.Status.CREATED)
-                    .entity("{\"mensaje\":\"Reservación guardada correctamente.\"}")
+            return Response.ok("{\"mensaje\":\"Reservación guardada correctamente.\"}")
                     .build();
         } catch (Exception e) {
             if (transaction != null) {
@@ -106,62 +101,10 @@ public class Reservaciones {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("{\"error\":\"Error al guardar la reservación.\"}")
                     .build();
-        }
-    }
-    
-    @POST
-    @Path("actualizar")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response actualizar(@FormParam("id") Long id,
-                           @FormParam("nombre_paciente") String nombre_paciente,
-                           @FormParam("direccion_paciente") String direccion_paciente,
-                           @FormParam("telefono_paciente") String telefono_paciente,
-                           @FormParam("correo_electronico") String correo_electronico,
-                           @FormParam("fecha") String fecha,
-                           @FormParam("hora") String hora,
-                           @FormParam("motivo_consulta") String motivo_consulta) {
-    
-    if (id == null) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity("{\"error\":\"El ID de la reservación es obligatorio.\"}")
-                .build();
-    }
-
-    Transaction transaction = null;
-    try (Session session = sessionFactory.openSession()) {
-        transaction = session.beginTransaction();
-
-        ReservacionesBD reservacion = session.get(ReservacionesBD.class, id);
-        if (reservacion == null) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\":\"Reservación no encontrada.\"}")
-                    .build();
-        }
-
-        // Actualizar los campos
-        reservacion.setNombre_paciente(nombre_paciente);
-        reservacion.setDireccion_paciente(direccion_paciente);
-        reservacion.setTelefono_paciente(telefono_paciente);
-        reservacion.setCorreo_electronico(correo_electronico);
-        reservacion.setFecha(fecha);
-        reservacion.setHora(hora);
-        reservacion.setMotivo_consulta(motivo_consulta);
-
-        session.update(reservacion);
-        transaction.commit();
-
-        return Response.status(Response.Status.OK)
-                .entity("{\"mensaje\":\"Reservación actualizada correctamente.\"}")
-                .build();
-    } catch (Exception e) {
-        if (transaction != null) {
-            transaction.rollback();
-        }
-        e.printStackTrace();
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("{\"error\":\"Error al actualizar la reservación.\"}")
-                .build();
+        } finally {
+            if (session != null){
+            session.close();
+            }
         }
     }
     
@@ -170,6 +113,8 @@ public class Reservaciones {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response eliminar(@FormParam("id") Long id) {
+        Session session = null;
+        Transaction transaction = null;
     
     if (id == null) {
         return Response.status(Response.Status.BAD_REQUEST)
@@ -177,22 +122,21 @@ public class Reservaciones {
                 .build();
     }
 
-    Transaction transaction = null;
-    try (Session session = sessionFactory.openSession()) {
+    try {
+        session = sessionFactory.openSession(); 
         transaction = session.beginTransaction();
 
         ReservacionesBD reservacion = session.get(ReservacionesBD.class, id);
+        
         if (reservacion == null) {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\":\"Reservación no encontrada.\"}")
+                    .entity("{\"error\":\"Reservación no encontradacon id: " + id + "\"}")
                     .build();
         }
-
         session.delete(reservacion);
         transaction.commit();
 
-        return Response.status(Response.Status.OK)
-                .entity("{\"mensaje\":\"Reservación eliminada correctamente.\"}")
+        return Response.ok("{\"mensaje\":\"Reservación eliminada correctamente.\"}")
                 .build();
     } catch (Exception e) {
         if (transaction != null) {
@@ -202,6 +146,87 @@ public class Reservaciones {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity("{\"error\":\"Error al eliminar la reservación.\"}")
                 .build();
+       }finally {
+         if (session != null){
+             session.close();
+            }
+        }
+    }
+    
+    @POST
+    @Path("editar")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response editar(@FormParam("id") Long id,
+                       @FormParam("nombre_paciente") String nombre_paciente,
+                       @FormParam("direccion_paciente") String direccion_paciente,
+                       @FormParam("telefono_paciente") String telefono_paciente,
+                       @FormParam("correo_electronico") String correo_electronico,
+                       @FormParam("fecha") String fecha,
+                       @FormParam("hora") String hora,
+                       @FormParam("motivo_consulta") String motivo_consulta) {
+
+    Session session = null;
+    Transaction transaction = null;
+
+    if (id == null) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("{\"error\":\"El ID de la reservación es obligatorio.\"}")
+                .build();
+    }
+
+    try {
+        session = sessionFactory.openSession();
+        transaction = session.beginTransaction();
+
+        ReservacionesBD reservacion = session.get(ReservacionesBD.class, id);
+        
+        if (reservacion == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\":\"Reservación no encontrada con id: " + id + "\"}")
+                    .build();
+        }
+
+        // Actualizar los campos solo si no son nulos o vacíos
+        if (nombre_paciente != null && !nombre_paciente.trim().isEmpty()) {
+            reservacion.setNombre_paciente(nombre_paciente);
+        }
+        if (direccion_paciente != null && !direccion_paciente.trim().isEmpty()) {
+            reservacion.setDireccion_paciente(direccion_paciente);
+        }
+        if (telefono_paciente != null && !telefono_paciente.trim().isEmpty()) {
+            reservacion.setTelefono_paciente(telefono_paciente);
+        }
+        if (correo_electronico != null && !correo_electronico.trim().isEmpty()) {
+            reservacion.setCorreo_electronico(correo_electronico);
+        }
+        if (fecha != null && !fecha.trim().isEmpty()) {
+            reservacion.setFecha(fecha);
+        }
+        if (hora != null && !hora.trim().isEmpty()) {
+            reservacion.setHora(hora);
+        }
+        if (motivo_consulta != null && !motivo_consulta.trim().isEmpty()) {
+            reservacion.setMotivo_consulta(motivo_consulta);
+        }
+
+        session.update(reservacion);
+        transaction.commit();
+
+        return Response.ok("{\"mensaje\":\"Reservación actualizada correctamente.\"}")
+                .build();
+    } catch (Exception e) {
+        if (transaction != null) {
+            transaction.rollback();
+        }
+        e.printStackTrace();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("{\"error\":\"Error al actualizar la reservación.\"}")
+                .build();
+    } finally {
+        if (session != null) {
+            session.close();
+            }
         }
     }
 }
