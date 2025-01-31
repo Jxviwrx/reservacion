@@ -27,7 +27,7 @@ private static SessionFactory sessionFactory;
     }
 
     @POST
-    @Path("Usuarios")
+    @Path("usuario")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response autenticar(@FormParam("nombre") String nombre,
