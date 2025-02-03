@@ -4,6 +4,7 @@
  */
 package modelBD;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,18 +18,33 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "reservaciones")
 public class ReservacionesBD {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    String nombre_paciente;
-    String direccion_paciente;
-    String telefono_paciente;
-    String correo_electronico;
-    String fecha;
-    String hora;
-    String motivo_consulta;
+    @Column(name = "nombre_paciente")
+    private String nombre_paciente;
+    
+    @Column(name = "direccion_paciente")
+    private String direccion_paciente;
+    
+    @Column(name = "telefono_paciente")
+    private String telefono_paciente;
+    
+    @Column(name = "correo_electronico")
+    private String correo_electronico;
+    
+    @Column(name = "fecha")
+    private String fecha;
+    
+    @Column(name = "hora")
+    private String hora;
+    
+    @Column(name = "motivo_consulta")
+    private String motivo_consulta;
 
+    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -92,7 +108,4 @@ public class ReservacionesBD {
     public void setMotivo_consulta(String motivo_consulta) {
         this.motivo_consulta = motivo_consulta;
     }
-    
-    
-    
 }
