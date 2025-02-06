@@ -15,7 +15,7 @@ import javax.persistence.Table;
  * @author LENOVO
  */
 @Entity
-@Table(name = "Usuario")
+@Table(name = "usuarios")
 public class UsuariosBD {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class UsuariosBD {
     String direccion;
     String correo_electronico;
     String fecha_ingreso;
-    String contraseña;
+    String contrasena;
     String rol_usuario;
     String estado;
     
@@ -70,12 +70,12 @@ public class UsuariosBD {
         this.fecha_ingreso = fecha_ingreso;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getRol_usuario() {
