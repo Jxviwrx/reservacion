@@ -27,15 +27,15 @@ private static SessionFactory sessionFactory;
     }
 
     @POST
-    @Path("usuario")
+    @Path("usuarios")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response autenticar(@FormParam("nombre") String nombre,
-                               @FormParam("contraseña") String contraseña) {
+                               @FormParam("contrasena") String contrasena) {
         Session session = null;
 
         if (nombre == null || nombre.trim().isEmpty() ||
-            contraseña == null || contraseña.trim().isEmpty()) {
+            contrasena == null || contrasena.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("{\"error\":\"Nombre de usuario y contraseña son obligatorios.\"}")
                            .build();
@@ -44,19 +44,19 @@ private static SessionFactory sessionFactory;
         try {
             session = sessionFactory.openSession();
             
-            String hql = "FROM UsuariosBD u WHERE u.nombre = :nombre AND u.contraseña = :contraseña";
-            UsuariosBD Usuarios = (UsuariosBD) session.createQuery(hql)
+            String hql = "FROM UsuariosBD u WHERE u.nombre = :nombre AND u.contrasena = :contrasena";
+            UsuariosBD usuarios = (UsuariosBD) session.createQuery(hql)
                                                      .setParameter("nombre", nombre)
-                                                     .setParameter("contraseña", contraseña)
+                                                     .setParameter("contrasena", contrasena)
                                                      .uniqueResult();
 
-            if (Usuarios == null) {
+            if (usuarios == null) {
                 return Response.status(Response.Status.UNAUTHORIZED)
                                .entity("{\"error\":\"Usuario o contraseña incorrectos.\"}")
                                .build();
             }
 
-            return Response.ok("{\"message\":\"Login exitoso\", \"id_usuario\": " + Usuarios.getId() + "}")
+            return Response.ok("{\"message\":\"Login exitoso\", \"id_usuario\": " + usuarios.getId() + "}")
                            .build();
         } catch (Exception e) {
             e.printStackTrace();
