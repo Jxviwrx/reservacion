@@ -23,28 +23,14 @@ public class ReservacionesBD {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "nombre_paciente")
-    private String nombre_paciente;
-    
-    @Column(name = "direccion_paciente")
-    private String direccion_paciente;
-    
-    @Column(name = "telefono_paciente")
-    private String telefono_paciente;
-    
-    @Column(name = "correo_electronico")
-    private String correo_electronico;
-    
-    @Column(name = "fecha")
-    private String fecha;
-    
-    @Column(name = "hora")
-    private String hora;
-    
-    @Column(name = "motivo_consulta")
-    private String motivo_consulta;
+    String nombre_paciente;
+    String direccion_paciente;
+    String telefono_paciente;
+    String correo_electronico;
+    String fecha;
+    String hora;
+    String motivo_consulta;
 
-    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -81,8 +67,8 @@ public class ReservacionesBD {
         return correo_electronico;
     }
 
-    public void setCorreo_electronico(String correo_electronico) {
-        this.correo_electronico = correo_electronico;
+    public void setCorreo_electronico(String correo_elecronico) {
+        this.correo_electronico = correo_elecronico;
     }
 
     public String getFecha() {
