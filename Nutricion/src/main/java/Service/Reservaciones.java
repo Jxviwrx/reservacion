@@ -4,26 +4,29 @@
  */
 package Service;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import java.util.logging.Logger;
 import modelBD.ReservacionesBD;
-
 
 @Path("Reservaciones")
 public class Reservaciones {
-    private static SessionFactory sessionFactory;
+    
+    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static final Logger LOGGER = Logger.getLogger(Reservaciones.class.getName());
 
-    static {
-       sessionFactory = new Configuration().configure().buildSessionFactory();
+    private static SessionFactory buildSessionFactory() {
+        try {
+            return new Configuration().configure().buildSessionFactory();
+        } catch (Throwable ex) {
+            LOGGER.severe("Error al inicializar Hibernate: " + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
     }
 
     @POST
@@ -40,44 +43,35 @@ public class Reservaciones {
 
         if (nombre_paciente == null || nombre_paciente.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"El nombre del paciente es obligatorio.\"}")
-                    .build();
+                    .entity("{\"error\":\"El nombre del paciente es obligatorio.\"}").build();
         }
         if (direccion_paciente == null || direccion_paciente.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"La dirección del paciente es obligatoria.\"}")
-                    .build();
+                    .entity("{\"error\":\"La dirección del paciente es obligatoria.\"}").build();
         }
         if (telefono_paciente == null || telefono_paciente.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"El teléfono del paciente es obligatorio.\"}")
-                    .build();
+                    .entity("{\"error\":\"El teléfono del paciente es obligatorio.\"}").build();
         }
         if (correo_electronico == null || correo_electronico.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"El correo electrónico es obligatorio.\"}")
-                    .build();
+                    .entity("{\"error\":\"El correo electrónico es obligatorio.\"}").build();
         }
         if (fecha == null || fecha.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"La fecha de la reservación es obligatoria.\"}")
-                    .build();
+                    .entity("{\"error\":\"La fecha de la reservación es obligatoria.\"}").build();
         }
         if (hora == null || hora.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"La hora de la reservación es obligatoria.\"}")
-                    .build();
+                    .entity("{\"error\":\"La hora de la reservación es obligatoria.\"}").build();
         }
         if (motivo_consulta == null || motivo_consulta.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"El motivo de consulta es obligatorio.\"}")
-                    .build();
+                    .entity("{\"error\":\"El motivo de consulta es obligatorio.\"}").build();
         }
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
+
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
 
             ReservacionesBD reservacion = new ReservacionesBD();
             reservacion.setNombre_paciente(nombre_paciente);
@@ -91,20 +85,11 @@ public class Reservaciones {
             session.save(reservacion);
             transaction.commit();
 
-            return Response.ok("{\"mensaje\":\"Reservación guardada correctamente.\"}")
-                    .build();
+            return Response.ok("{\"mensaje\":\"Reservación guardada correctamente.\"}").build();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+            LOGGER.severe("Error al guardar la reservación: " + e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("{\"error\":\"Error al guardar la reservación.\"}")
-                    .build();
-        } finally {
-            if (session != null){
-            session.close();
-            }
+                    .entity("{\"error\":\"Error al guardar la reservación.\"}").build();
         }
     }
 }
