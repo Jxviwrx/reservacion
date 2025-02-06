@@ -17,7 +17,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
-@Path("Usuario")
+@Path("Usuarios")
 public class Usuarios {
     private static SessionFactory sessionFactory;
      static {
@@ -30,7 +30,7 @@ public class Usuarios {
     public Response guardar(@FormParam("nombre") String nombre,
                         @FormParam("direccion") String direccion,
                         @FormParam("correo_electronico") String correo_electronico,
-                        @FormParam("contraseña") String contraseña,
+                        @FormParam("contrasena") String contrasena,
                         @FormParam("rol_usuario") String rol_usuario) {
         if (nombre == null || nombre.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -47,7 +47,7 @@ public class Usuarios {
                     .entity("{\"error\":\"El correo electrónico es obligatorio.\"}")
                     .build();
         }
-        if (contraseña == null || contraseña.trim().isEmpty()) {
+        if (contrasena == null || contrasena.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("{\"error\":\"La contraseña es obligatoria.\"}")
                     .build();
@@ -68,7 +68,7 @@ public class Usuarios {
             usuario.setNombre(nombre);
             usuario.setDireccion(direccion);
             usuario.setCorreo_electronico(correo_electronico);
-            usuario.setContraseña(contraseña);
+            usuario.setContrasena(contrasena);
             usuario.setRol_usuario(rol_usuario);
             
             session.save(usuario);
