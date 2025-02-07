@@ -4,6 +4,7 @@
  */
 package modelBD;
 
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,14 +22,13 @@ public class UsuariosBD {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    String nombre;
     String direccion;
     String correo_electronico;
-    String fecha_ingreso;
     String contrasena;
     String rol_usuario;
-    String estado;
-    
-    String nombre;
+    boolean activo;
+    Date fecha_ingreso;
 
     public Long getId() {
         return id;
@@ -62,14 +62,6 @@ public class UsuariosBD {
         this.correo_electronico = correo_electronico;
     }
 
-    public String getFecha_ingreso() {
-        return fecha_ingreso;
-    }
-
-    public void setFecha_ingreso(String fecha_ingreso) {
-        this.fecha_ingreso = fecha_ingreso;
-    }
-
     public String getContrasena() {
         return contrasena;
     }
@@ -86,11 +78,21 @@ public class UsuariosBD {
         this.rol_usuario = rol_usuario;
     }
 
-    public String getEstado() {
-        return estado;
+    public boolean isActivo() {
+        return activo;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
-}
+
+    public Date getFecha_ingreso() {
+        return fecha_ingreso;
+    }
+
+    public void setFecha_ingreso(Date fecha_ingreso) {
+        this.fecha_ingreso = fecha_ingreso;
+    }
+    }
+    
+
