@@ -21,7 +21,7 @@
         <property name="hibernate.format_sql">true</property>
 
         <!-- Gestión del esquema de base de datos -->
-        <property name="hibernate.hbm2ddl.auto">create-drop</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
 
         <!-- Mapeos de clases -->
        <mapping class="modelBD.UsuariosBD"/>
