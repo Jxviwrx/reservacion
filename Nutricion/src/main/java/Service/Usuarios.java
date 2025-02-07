@@ -4,6 +4,7 @@
  */
 package Service;
 
+import java.util.Date;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -20,18 +21,22 @@ import org.hibernate.cfg.Configuration;
 @Path("Usuarios")
 public class Usuarios {
     private static SessionFactory sessionFactory;
-     static {
-        sessionFactory = new Configuration().configure().buildSessionFactory();}
-    
+
+    static {
+        sessionFactory = new Configuration().configure().buildSessionFactory();
+    }
+
     @POST
     @Path("guardar")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response guardar(@FormParam("nombre") String nombre,
-                        @FormParam("direccion") String direccion,
-                        @FormParam("correo_electronico") String correo_electronico,
-                        @FormParam("contrasena") String contrasena,
-                        @FormParam("rol_usuario") String rol_usuario) {
+                            @FormParam("direccion") String direccion,
+                            @FormParam("correo_electronico") String correo_electronico,
+                            @FormParam("contrasena") String contrasena,
+                            @FormParam("rol_usuario") String rol_usuario,
+                            @FormParam("activo") int activo) {
+        // Validación de parámetros
         if (nombre == null || nombre.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("{\"error\":\"El nombre es obligatorio.\"}")
@@ -57,22 +62,31 @@ public class Usuarios {
                     .entity("{\"error\":\"El rol de usuario es obligatorio.\"}")
                     .build();
         }
-        
+
+        activo = 1; // Establecer siempre el valor de 'activo' como 1
+
+        Date fecha_ingreso = new Date();  
+
         Session session = null;
         Transaction transaction = null;
         try {
             session = sessionFactory.openSession();
             transaction = session.beginTransaction();
 
+            // Crear un nuevo objeto UsuarioBD
             UsuariosBD usuario = new UsuariosBD();
             usuario.setNombre(nombre);
             usuario.setDireccion(direccion);
             usuario.setCorreo_electronico(correo_electronico);
             usuario.setContrasena(contrasena);
             usuario.setRol_usuario(rol_usuario);
-            
+            usuario.setActivo(activo == 1);  // Esto siempre será verdadero, ya que 'activo' es 1
+            usuario.setFecha_ingreso(fecha_ingreso);  // Asignar la fecha de ingreso
+
+            // Guardar el usuario en la base de datos
             session.save(usuario);
             transaction.commit();
+
             return Response.status(Response.Status.OK)
                     .entity("{\"mensaje\":\"Usuario guardado correctamente.\"}")
                     .build();
