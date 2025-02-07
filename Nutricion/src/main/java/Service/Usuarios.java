@@ -18,6 +18,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
+import java.util.Date;
+import java.util.Calendar;
+
 @Path("Usuarios")
 public class Usuarios {
     private static SessionFactory sessionFactory;
@@ -63,9 +66,16 @@ public class Usuarios {
                     .build();
         }
 
+        // Asignamos "1" a activo independientemente del valor recibido
         activo = 1; // Establecer siempre el valor de 'activo' como 1
 
-        Date fecha_ingreso = new Date();  
+        // Obtener la fecha actual solo con el año, mes y día
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);   // Establecer la hora a medianoche
+        calendar.set(Calendar.MINUTE, 0);        // Establecer los minutos a 0
+        calendar.set(Calendar.SECOND, 0);        // Establecer los segundos a 0
+        calendar.set(Calendar.MILLISECOND, 0);   // Establecer los milisegundos a 0
+        Date fecha_ingreso = calendar.getTime();  // Obtiene la fecha sin la hora
 
         Session session = null;
         Transaction transaction = null;
@@ -81,7 +91,7 @@ public class Usuarios {
             usuario.setContrasena(contrasena);
             usuario.setRol_usuario(rol_usuario);
             usuario.setActivo(activo == 1);  // Esto siempre será verdadero, ya que 'activo' es 1
-            usuario.setFecha_ingreso(fecha_ingreso);  // Asignar la fecha de ingreso
+            usuario.setFecha_ingreso(fecha_ingreso);  // Asignar la fecha de ingreso sin la hora
 
             // Guardar el usuario en la base de datos
             session.save(usuario);
