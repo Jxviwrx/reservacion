@@ -1,12 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Service;
 
 import java.util.Set;
 import javax.ws.rs.core.Application;
-
 
 @javax.ws.rs.ApplicationPath("webresources")
 public class ApplicationConfig extends Application {
@@ -25,9 +20,11 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        // Registra el filtro CORS
+        resources.add(Service.CorsFilter.class);
+        // Registra tus recursos (servicios) aquí
         resources.add(Service.Login.class);
         resources.add(Service.Reservaciones.class);
         resources.add(Service.Usuarios.class);
     }
-    
 }
