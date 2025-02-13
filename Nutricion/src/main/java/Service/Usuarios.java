@@ -4,8 +4,8 @@
  */
 package Service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
+import com.google.gson.Gson;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -21,6 +21,7 @@ import org.hibernate.cfg.Configuration;
 
 import java.util.Date;
 import java.util.Calendar;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
 
@@ -227,7 +228,36 @@ public class Usuarios {
          }
       }
    }
+   
+    @GET
+    @Path("mostrar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response mostrar() {
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
 
+            // Crear una consulta HQL para obtener todos los usuarios
+            String hql = "FROM UsuariosBD";
+            List<UsuariosBD> usuarios = session.createQuery(hql, UsuariosBD.class).getResultList();
+
+            // Convertir la lista de usuarios a JSON
+            Gson gson = new Gson();
+            String json = gson.toJson(usuarios);
+
+            return Response.ok(json).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Error al obtener los usuarios: " + e.getMessage() + "\"}")
+                    .build();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    } 
+   
    @GET
     @Path("activar")
     @Produces(MediaType.APPLICATION_JSON)
