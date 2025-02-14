@@ -4,6 +4,8 @@
  */
 package Service;
 
+import com.google.gson.Gson;
+import java.util.List;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -188,4 +190,32 @@ public class Reservaciones {
             }
         }
     }
+    @GET
+    @Path("mostrar")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response mostrar() {
+        Session session = null;
+        try {
+            session = sessionFactory.openSession();
+
+            // Crear una consulta HQL para obtener todos los usuarios
+            String hql = "FROM ReservacionesBD";
+            List<ReservacionesBD> reservaciones = session.createQuery(hql, ReservacionesBD.class).getResultList();
+
+            // Convertir la lista de usuarios a JSON
+            Gson gson = new Gson();
+            String json = gson.toJson(reservaciones);
+
+            return Response.ok(json).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Error al obtener las reservaciones: " + e.getMessage() + "\"}")
+                    .build();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    } 
 }
